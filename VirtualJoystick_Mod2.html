@@ -1,0 +1,205 @@
+<html>
+<head>
+
+    <!--Import materialize.css-->
+    <link type="text/css" rel="stylesheet" href="css/materialize.min.css" media="screen,projection" />
+
+    <!--Import jqyuery.js-->
+    <script type="text/javascript" src="js/jquery-2.1.3.min.js"></script>
+
+    <!--Import materialize.js-->
+    <script type="text/javascript" src="js/materialize.min.js"></script>
+
+    <!--Let browser know website is optimized for mobile-->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+
+    <!--iPhone Web App comaptibility-->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+
+    <!--Chrome for Android Web App comaptibility-->
+    <meta name="mobile-web-app-capable" content="yes" />
+
+    <!--Import EventEmitter2-->
+    <script type="text/javascript" src="js/eventemitter2.min.js"></script>
+
+    <!--Import ROS Library-->
+    <script type="text/javascript" src="js/roslib.min.js"></script>
+
+    <script src="js/virtualjoystick.js"></script>
+
+    <!--Website Title-->
+    <title>ROS Controller</title>
+
+    <style>
+        body {
+            overflow: hidden;
+            padding: 0;
+            margin: 0;
+        }
+
+        #info {
+            position: absolute;
+            top: 0px;
+            width: 100%;
+        }
+
+        #container {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            padding: 0;
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+            -o-user-select: none;
+            user-select: none;
+        }
+    </style>
+</head>
+<body>
+<span id="result1"></span>
+<br>
+<span id="result2"></span>
+
+
+    <!--Script to connect to the server, read joystick data and send messages to the server-->
+    <script>
+        //Assigning session data to the variables
+        var Name = window.parent.document.getElementById('Name').value;
+        var ServerAddress = window.parent.document.getElementById('ServerAddress').value;
+        var Port = window.parent.document.getElementById('Port').value;
+        var twist2;
+        var X2_Max = parseFloat(window.parent.document.getElementById('MaxX2Val').value);
+        var Y2_Max = parseFloat(window.parent.document.getElementById('MaxY2Val').value);
+        var Z2_Max = parseFloat(window.parent.document.getElementById('MaxZ2Val').value);
+        var Divisor_XY2 = parseFloat(window.parent.document.getElementById('DivisorVal_XY2').value);
+        var Divisor_Z2 = parseFloat(window.parent.document.getElementById('DivisorVal_Z2').value);       
+        var X2 = 0;
+        var Y2 = 0;
+        var Z2 = 0;
+
+        //Function to connect to the websocket server
+        try {
+            var con = new ROSLIB.Ros({
+                url: 'ws://' + ServerAddress + ':' + Port
+            });
+
+            //Function on failed connection to the websocket server
+            con.on('error', function (error) {
+                parent.ConnectionError();
+            });
+
+            //Function on connection to the websocket server getting closed
+            con.on('close', function () {
+                parent.ConnectionClose();
+            });
+
+        }
+        catch (err) {
+            parent.ConnectionError();
+        }
+
+        //create a Ros node object to communicate with the server
+        var cmdVel = new ROSLIB.Topic({
+            ros: con,
+            name: Name+'2' + '/cmd_vel',
+            messageType: 'geometry_msgs/Twist'
+        });
+
+        //Function to show a warning message when touch screen is not detected
+        if (!VirtualJoystick.touchScreenAvailable()) {
+            parent.TouchScreenWarning();
+        }
+
+        var joystick = new VirtualJoystick({
+            container: document.body,
+            limitStickTravel: true,
+            stickRadius: 150,
+            mouseSupport: true,
+        });
+        
+        joystick.addEventListener('touchStartValidation', function (event) {
+            var touch = event.changedTouches[0];
+            if (touch.pageX < window.innerWidth / 2) return false;
+            return true
+        });
+
+        var joystick2 = new VirtualJoystick({
+            container: document.body,
+            limitStickTravel: true,
+            stickRadius: 150,
+            mouseSupport: true,
+        });
+
+        joystick2.addEventListener('touchStartValidation', function (event) {
+            var touch = event.changedTouches[0];
+            if (touch.pageX >= window.innerWidth / 2) return false;
+            return true
+        });       
+
+        setInterval(function(){
+            var outputEl    = document.getElementById('result1');
+            outputEl.innerHTML  = '<b>Result1:</b> '
+            + ' dx:'+Math.round(joystick2.deltaX())
+            + ' dy:'+Math.round(joystick2.deltaY())
+            + ' X Value: ' + X2 + '  '
+            + ' Y Value: ' + Y2 + '  '
+        }, 1/30 * 1000);
+
+        setInterval(function(){
+            var outputEl    = document.getElementById('result2');
+            outputEl.innerHTML  = '<b>Result2:</b> '
+            + ' dx:'+Math.round(joystick.deltaX())
+            + ' dy:'+Math.round(joystick.deltaY())
+            + ' Z Value: ' + Z2 + '  '
+        }, 1/30 * 1000);    
+
+
+        var intervalId1 = setInterval(function() {
+            X2 = (joystick2.deltaX() / Divisor_XY2);
+            Y2 = (joystick2.deltaY() / Divisor_XY2);
+            Z2 = (joystick.deltaY() / Divisor_Z2);
+
+            if (X2 >= X2_Max){
+                X2 = X2_Max               
+            }
+            if (X2 <= -X2_Max){
+                X2 = -X2_Max               
+            }
+            if (Y2 >= Y2_Max){
+                Y2 = Y2_Max                   
+            }
+            if (Y2 <= -Y2_Max){
+                Y2 = -Y2_Max                   
+            }
+            if (Z2 >= Z2_Max){
+                Z2 = Z2_Max                
+            }
+            if (Z2 <= -Z2_Max){
+                Z2 = -Z2_Max                
+            }      
+        }, 1000);               
+
+
+        //Function to send messages to the server every 0.01 seconds based on joystick data
+        function Move() {         
+
+            twist2 = new ROSLIB.Message({ "linear": { "x": X2, "y": Y2, "z": Z2 }, "angular": { "x": 0, "y": 0, "z": 0 } });
+            cmdVel.publish(twist2);
+
+            if (joystick.deltaX() === 0 && joystick.deltaY() === 0){
+                Z2 = 0
+            }
+            if (joystick2.deltaX() === 0 && joystick2.deltaY() === 0){
+                X2 = 0
+                Y2 = 0
+            }
+                
+            setTimeout(Move, 10);
+        }
+        Move();
+
+    </script>
+</body>
+</html>
