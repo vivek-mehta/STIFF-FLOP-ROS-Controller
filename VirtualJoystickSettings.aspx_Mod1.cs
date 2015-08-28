@@ -12,28 +12,24 @@ public partial class VirtualJoystickProperties : System.Web.UI.Page
         if (!Page.IsPostBack)
         {
             //Check if the acceleration settings exist
-            if (Session["VJMaxX1Val"] != null && Session["VJMaxY1Val"] != null && Session["VJMaxZ1Val"] != null && Session["VJDivisorVal_XY1"] != null && Session["VJDivisorVal_Z1"] != null)
+            if (Session["VJMaxX1Val"] != null && Session["VJMaxY1Val"] != null && Session["VJMaxZ1Val"] != null)
             {
                 //Fill the textbox with the acceleration settings
                 MaxX1Val.Value = Session["VJMaxX1Val"].ToString();
                 MaxY1Val.Value = Session["VJMaxY1Val"].ToString();
                 MaxZ1Val.Value = Session["VJMaxZ1Val"].ToString();
-                DivisorVal_XY1.Value = Session["VJDivisorVal_XY1"].ToString();
-                DivisorVal_Z1.Value = Session["VJDivisorVal_Z1"].ToString();
             }
         }
     }
     protected void SaveProperties(object sender, EventArgs e)
     {
         //Check if all the fields have been completed
-        if (MaxX1Val.Value != "" && MaxY1Val.Value != "" && MaxZ1Val.Value != "" && DivisorVal_XY1.Value != "" && DivisorVal_Z1.Value != "")
+        if (MaxX1Val.Value != "" && MaxY1Val.Value != "" && MaxZ1Val.Value != "")
         {
             //Save the acceleration settings
             Session["VJMaxX1Val"] = MaxX1Val.Value;
             Session["VJMaxY1Val"] = MaxY1Val.Value;
             Session["VJMaxZ1Val"] = MaxZ1Val.Value;
-            Session["VJDivisorVal_XY1"] = DivisorVal_XY1.Value;
-            Session["VJDivisorVal_Z1"] = DivisorVal_Z1.Value;
             Response.Redirect("VirtualJoystick_Mod1.aspx");
         }
         else

@@ -53,23 +53,6 @@
                     </div>
                 </div>
 
-                <%--Divisor Value - XY1 Property Field--%>
-                <div class="row">
-                    <div class="input-field col s12">
-                        <label for="DivisorVal_XY2" class="active">Divisor Value For X & Y</label>
-                        <input runat="server" value="" id="DivisorVal_XY2" type="text" class="validate" />
-                    </div>
-                </div>
-
-                <%--Divisor Value - Z1 Property Field--%>
-                <div class="row">
-                    <div class="input-field col s12">
-                        <label for="DivisorVal_Z2" class="active">Divisor Value For Z</label>
-                        <input runat="server" value="" id="DivisorVal_Z2" type="text" class="validate" />
-                    </div>
-                </div>
-                
-
                 <%--Submit Button--%>
                 <div class="row">
                     <div class="grid-example col s12">

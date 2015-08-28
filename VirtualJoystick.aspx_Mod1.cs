@@ -18,14 +18,12 @@ public partial class ext : System.Web.UI.Page
             else
             {
                 //Check if the acceleration settings exist
-                if (Session["VJMaxX1Val"] == null || Session["VJMaxY1Val"] == null || Session["VJMaxZ1Val"] == null || Session["VJDivisorVal_XY1"] == null || Session["VJDivisorVal_Z1"] == null)
+                if (Session["VJMaxX1Val"] == null || Session["VJMaxY1Val"] == null || Session["VJMaxZ1Val"] == null)
                 {
                     //Set default settings
-                    Session["VJMaxX1Val"] = "0.0001";
-                    Session["VJMaxY1Val"] = "0.0001";
-                    Session["VJMaxZ1Val"] = "0.0001";
-                    Session["VJDivisorVal_XY1"] = "145000";
-                    Session["VJDivisorVal_Z1"] = "145000";
+                    Session["VJMaxX1Val"] = "0.1";
+                    Session["VJMaxY1Val"] = "0.1";
+                    Session["VJMaxZ1Val"] = "0.1";
                 }
 
                 //Pass properties from code behind to the webpage
@@ -35,8 +33,6 @@ public partial class ext : System.Web.UI.Page
                 HiddenElements.Text = HiddenElements.Text + @"<input type=""text"" id=""MaxX1Val"" value=" + Session["VJMaxX1Val"].ToString() + " style='display: none;'/>";
                 HiddenElements.Text = HiddenElements.Text + @"<input type=""text"" id=""MaxY1Val"" value=" + Session["VJMaxY1Val"].ToString() + " style='display: none;'/>";
                 HiddenElements.Text = HiddenElements.Text + @"<input type=""text"" id=""MaxZ1Val"" value=" + Session["VJMaxZ1Val"].ToString() + " style='display: none;'/>";
-                HiddenElements.Text = HiddenElements.Text + @"<input type=""text"" id=""DivisorVal_XY1"" value=" + Session["VJDivisorVal_XY1"].ToString() + " style='display: none;'/>";
-                HiddenElements.Text = HiddenElements.Text + @"<input type=""text"" id=""DivisorVal_Z1"" value=" + Session["VJDivisorVal_Z1"].ToString() + " style='display: none;'/>";
             }
         }
     }

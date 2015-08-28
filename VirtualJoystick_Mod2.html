@@ -72,9 +72,7 @@
         var twist2;
         var X2_Max = parseFloat(window.parent.document.getElementById('MaxX2Val').value);
         var Y2_Max = parseFloat(window.parent.document.getElementById('MaxY2Val').value);
-        var Z2_Max = parseFloat(window.parent.document.getElementById('MaxZ2Val').value);
-        var Divisor_XY2 = parseFloat(window.parent.document.getElementById('DivisorVal_XY2').value);
-        var Divisor_Z2 = parseFloat(window.parent.document.getElementById('DivisorVal_Z2').value);       
+        var Z2_Max = parseFloat(window.parent.document.getElementById('MaxZ2Val').value);      
         var X2 = 0;
         var Y2 = 0;
         var Z2 = 0;
@@ -157,10 +155,6 @@
 
 
         var intervalId1 = setInterval(function() {
-            X2 = (joystick2.deltaX() / Divisor_XY2);
-            Y2 = (joystick2.deltaY() / Divisor_XY2);
-            Z2 = (joystick.deltaY() / Divisor_Z2);
-
             if (X2 >= X2_Max){
                 X2 = X2_Max               
             }
@@ -183,7 +177,11 @@
 
 
         //Function to send messages to the server every 0.01 seconds based on joystick data
-        function Move() {         
+        function Move() {
+
+            X2 = ((X2_Max*joystick2.deltaX()) / 150);
+            Y2 = ((Y2_Max*joystick2.deltaY()) / 150);
+            Z2 = ((Z2_Max*joystick.deltaY()) / 150);
 
             twist2 = new ROSLIB.Message({ "linear": { "x": X2, "y": Y2, "z": Z2 }, "angular": { "x": 0, "y": 0, "z": 0 } });
             cmdVel.publish(twist2);
